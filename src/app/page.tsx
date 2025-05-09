@@ -29,7 +29,7 @@ export default function Home() {
         const response = await executeSQLQuery(generatedQuery);
         setDbResponse(response);
 
-        const naturalResponseText = await getNaturalResponse(generatedQuery);
+        const naturalResponseText = await getNaturalResponse(userInput, response);
         setNaturalResponse(naturalResponseText);
       } catch (error) {
         console.error('Error:', error);
