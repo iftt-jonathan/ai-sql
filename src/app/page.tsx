@@ -11,11 +11,38 @@ export default function Home() {
   const [sqlQuery, setSqlQuery] = useState('');
   const [dbResponse, setDbResponse] = useState('');
   const [naturalResponse, setNaturalResponse] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleSubmit = async () => {
-    setSqlQuery('SELECT * FROM users WHERE age > 25;');
-    setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
-    setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
+    if (!userInput) return;
+  
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: userInput }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      const generatedText = data.text;
+
+      setSqlQuery(generatedText);
+      // setDbResponse(data.dbResponse);
+      // setNaturalResponse(data.naturalResponse);
+      setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
+      setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
