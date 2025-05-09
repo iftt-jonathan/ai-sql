@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquare, Database, FileText } from 'lucide-react';
 import { useState, useTransition } from 'react';
-import { generateSQL } from './actions';
+import { generateSQL, executeSQLQuery, getNaturalResponse } from './actions';
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
@@ -22,10 +22,14 @@ export default function Home() {
 
     startTransition(async () => {
       try {
-        const generatedText = await generateSQL(userInput);
-        setSqlQuery(generatedText);
-        setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
-        setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
+        const generatedQuery = await generateSQL(userInput);
+        setSqlQuery(generatedQuery);
+
+        const response = await executeSQLQuery(generatedQuery);
+        setDbResponse(response);
+
+        const naturalResponseText = await getNaturalResponse(generatedQuery);
+        setNaturalResponse(naturalResponseText);
       } catch (error) {
         console.error('Error:', error);
         alert('Failed to generate SQL query.');

@@ -32,3 +32,35 @@ export async function generateSQL(prompt: string): Promise<string> {
     throw new Error("Failed to generate SQL query");
   }
 }
+
+export async function executeSQLQuery(query: string): Promise<string> {
+  try {
+    // Simulate a database response
+    const simulatedResponse = [
+      { id: 1, name: "John Doe", age: 30 },
+      { id: 2, name: "Jane Smith", age: 25 },
+    ];
+
+    // Convert the simulated response to a string
+    const responseString = simulatedResponse
+      .map((item) => `ID: ${item.id}, Name: ${item.name}, Age: ${item.age}`)
+      .join('\n');
+
+    return responseString;
+  } catch (error) {
+    console.error("Database execution error:", error);
+    throw new Error("Failed to execute SQL query");
+  }
+}
+
+export async function getNaturalResponse(query: string): Promise<string> {
+  try {
+    // Simulate a natural language response
+    const simulatedResponse = `There are 2 users: John Doe who is 30 years old and Jane Smith who is 25 years old.`;
+    return simulatedResponse;
+  }
+  catch (error) {
+    console.error("Natural language response error:", error);
+    throw new Error("Failed to generate natural language response");
+  }
+}
