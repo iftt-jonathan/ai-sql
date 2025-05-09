@@ -12,6 +12,7 @@ export default function Home() {
   const [sqlQuery, setSqlQuery] = useState('');
   const [dbResponse, setDbResponse] = useState('');
   const [naturalResponse, setNaturalResponse] = useState('');
+  const [strategy, setStrategy] = useState<'zero_shot' | 'single_domain_double_shot' | 'cross_domain_few_shot'>('zero_shot');
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = () => {
@@ -22,7 +23,7 @@ export default function Home() {
 
     startTransition(async () => {
       try {
-        const generatedQuery = await generateSQL(userInput);
+        const generatedQuery = await generateSQL(userInput, strategy);
         setSqlQuery(generatedQuery);
 
         const response = await executeSQLQuery(generatedQuery);
@@ -48,6 +49,15 @@ export default function Home() {
               <MessageSquare className="w-5 h-5 text-purple-500" />
               <h2 className="text-xl font-bold">Natural Language Query</h2>
             </div>
+            <select
+              value={strategy}
+              onChange={(e) => setStrategy(e.target.value as 'zero_shot' | 'single_domain_double_shot' | 'cross_domain_few_shot')}
+              className="w-full mb-4 p-2 bg-zinc-800 border border-purple-500/20 text-white rounded"
+            >
+              <option value="zero_shot">Zero Shot</option>
+              <option value="single_domain_double_shot">Single Domain Double Shot</option>
+              <option value="cross_domain_few_shot">Cross-domain Few-shot</option>
+            </select>
             <Textarea
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
