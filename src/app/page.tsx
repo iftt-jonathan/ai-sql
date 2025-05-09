@@ -4,45 +4,33 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageSquare, Database, FileText } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { generateSQL } from './actions';
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
   const [sqlQuery, setSqlQuery] = useState('');
   const [dbResponse, setDbResponse] = useState('');
   const [naturalResponse, setNaturalResponse] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!userInput.trim()) {
+      alert('Please enter a query before submitting.');
       return;
     }
-  
-    setIsGenerating(true);
-    try {
-      const response = await fetch('/api/generate-query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: userInput }),
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
+    startTransition(async () => {
+      try {
+        const generatedText = await generateSQL(userInput);
+        setSqlQuery(generatedText);
+        setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
+        setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to generate SQL query.');
       }
-
-      const data = await response.json();
-      const generatedText = data.text;
-
-      setSqlQuery(generatedText);
-      setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
-      setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsGenerating(false);
-    }
+    });
   };
 
   return (
@@ -65,8 +53,9 @@ export default function Home() {
             <Button
               onClick={handleSubmit}
               className="w-full bg-purple-500 hover:bg-purple-600"
+              disabled={isPending}
             >
-              Generate SQL Query
+              {isPending ? 'Generating...' : 'Generate SQL Query'}
             </Button>
           </Card>
 
