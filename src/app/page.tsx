@@ -14,7 +14,9 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleSubmit = async () => {
-    if (!userInput) return;
+    if (!userInput.trim()) {
+      return;
+    }
   
     setIsGenerating(true);
     try {
@@ -23,7 +25,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: userInput }),
+        body: JSON.stringify({ prompt: userInput }),
       });
 
       if (!response.ok) {
@@ -34,8 +36,6 @@ export default function Home() {
       const generatedText = data.text;
 
       setSqlQuery(generatedText);
-      // setDbResponse(data.dbResponse);
-      // setNaturalResponse(data.naturalResponse);
       setDbResponse('[ { "id": 1, "name": "John Doe", "age": 30 } ]');
       setNaturalResponse('There is 1 user over 25 years old: John Doe who is 30 years old.');
     } catch (error) {
